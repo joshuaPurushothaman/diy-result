@@ -146,15 +146,19 @@ where
 
 #[cfg(test)]
 mod tests {
-    /// This function will return an error if the test "passed" lol.
     #[test]
-    fn test_question_op() -> Result<(), &'static str> {
-        fn this_propagates_an_err() -> Result<u32, &'static str> {
+    fn test_question_op() {
+        fn might_err() -> Result<u32, &'static str> {
+            Err("Errored out!")
+        }
+
+        fn nested_call() -> Result<u32, &'static str> {
+            might_err()?;
+
             Err("whoops! :(")
         }
 
-        this_propagates_an_err()?;
-
-        Ok(())
+        // nested_call() must propagate might_err()'s Result::Err.
+        assert_eq!(nested_call(), might_err());
     }
 }
