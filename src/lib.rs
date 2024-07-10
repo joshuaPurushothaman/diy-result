@@ -6,7 +6,8 @@
 use core::ops::{ControlFlow, FromResidual, Try};
 use core::{convert::Infallible, ops::Residual};
 
-use Result::*; // allows us to shadow the core::result::Result type
+// allows us to shadow the core::result::Result type
+use Result::*;
 
 pub enum Result<T, E> {
     Ok(T),
@@ -15,11 +16,6 @@ pub enum Result<T, E> {
 
 impl<T, E> Result<T, E> {
     pub fn is_ok(&self) -> bool {
-        // match self {
-        //     Result::Ok(_) => true,
-        //     Result::Err(_) => false,
-        // }
-        // is equivalent to:
         matches!(self, Ok(_))
     }
 
@@ -59,10 +55,7 @@ impl<T, E> Result<T, E> {
     where
         F: FnOnce(T) -> U,
     {
-        match self {
-            Ok(t) => Ok(op(t)),
-            Err(e) => Err(e), //  TODO: revisit with ? operator later
-        }
+        Ok(op(self?))
     }
 
     pub fn map_err<U, F>(self, op: F) -> Result<T, U>
@@ -70,7 +63,7 @@ impl<T, E> Result<T, E> {
         F: FnOnce(E) -> U,
     {
         match self {
-            Err(e) => Err(op(e)), //  TODO: revisit with ? operator later
+            Err(e) => Err(op(e)),
             Ok(t) => Ok(t),
         }
     }
